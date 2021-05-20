@@ -1,0 +1,593 @@
+<!-- wp:html -->
+<!DOCTYPE html>
+<!--
+        auteur :Saad Belkrafi
+        date : 2021
+       
+-->
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8" />
+        <title>GET et POST</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <style type="text/css">
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Roboto+Slab:wght@400;700&display=swap');
+
+html {
+  height: 100%;
+  min-height:1000px;
+}
+body {
+  background-size:cover;
+  background-repeat:no-repeat;
+  text-align: center;
+ font-family: 'Noto Sans', sans-serif;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+h1{
+  font-weight:400;
+  padding-top:0;
+  margin-top:0;
+  font-family: 'Roboto Slab', serif;
+}
+
+#svg_form_time {
+  height: 15px;
+  max-width: 80%;
+  margin: 40px auto 20px;
+  display: block;
+}
+
+#svg_form_time circle,
+#svg_form_time rect {
+  fill: white;
+}
+
+.button {
+  background: #ffa500;
+  border-radius: 5px;
+  padding: 15px 25px;
+  display: inline-block;
+  margin: 10px;
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+  box-shadow:0px 2px 5px rgb(0,0,0,0.5);
+}
+
+.disabled {
+  display:none;
+}
+
+section {
+  padding: 50px ;
+  max-width: 1000px;
+  margin: 30px auto;
+  background:white;
+  background:rgba(255,255,255,0.9);
+  backdrop-filter:blur(10px);
+  box-shadow:0px 2px 10px rgba(0,0,0,0.3);
+  border-radius:5px;
+  transition:transform 0.2s ease-in-out;
+}
+
+
+input {
+  width: 100%;
+  margin: 7px 0px;
+  display: inline-block;
+  padding: 12px 25px;
+  box-sizing: border-box;
+  border-radius: 5px;
+  border: 1px solid lightgrey;
+  font-size: 1em;
+  font-family:inherit;
+  background:white;
+}
+
+p{
+  text-align:justify;
+margin-top:0;
+}
+#tb {
+  font-family: Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#tb td, #tb th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+#tb tr:nth-child(even){background-color: #f2f2f2;}
+
+#tb tr:hover {background-color: #ddd;}
+
+#tb th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #4CAF50;
+  color: white;
+}
+.tete{
+    background-color: #ffa500;
+}
+.dropbtn {
+  background-color: #ffa500;
+  color: white;
+  padding: 16px;
+  font-size: 16px;
+  border: none;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f1f1f1;
+  min-width: 500px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:hover {background-color: #ddd;}
+
+.dropdown:hover .dropdown-content {display: block;}
+
+.dropdown:hover .dropbtn {background-color: #cc5500;}
+table {
+  border: 1px solid black;
+}
+img {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 5px;
+  width: 500px;
+}
+#table_text table{
+    border-collapse:separate;
+    border-spacing:0 60px;
+    border: 0px solid black;
+    width: 100% ;
+
+}
+
+#table_text td {
+  border: 0px solid black;
+  text-align: left;
+width: 25% ;
+}
+#video {
+  /* override other styles to make responsive */
+  width: 100%    !important;
+  height: auto   !important;
+
+}
+embed{
+ width: 1200px;
+height: 600px; !important
+}
+
+        </style>
+
+        <script>
+            $( document ).ready(function() {
+var base_color = "rgb(230,230,230)";
+var active_color = "rgb(255, 165, 0)";
+
+
+
+var child = 1;
+var length = $("section").length - 1;
+$("#prev").addClass("disabled");
+$("#submit").addClass("disabled");
+
+$("section").not("section:nth-of-type(1)").hide();
+$("section").not("section:nth-of-type(1)").css('transform','translateX(100px)');
+
+var svgWidth = length * 200 + 24;
+$("#svg_wrap").html(
+  '<svg version="1.1" id="svg_form_time" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 ' +
+    svgWidth +
+    ' 24" xml:space="preserve"></svg>'
+);
+
+function makeSVG(tag, attrs) {
+  var el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (var k in attrs) el.setAttribute(k, attrs[k]);
+  return el;
+}
+
+for (i = 0; i < length; i++) {
+  var positionX = 12 + i * 200;
+  var rect = makeSVG("rect", { x: positionX, y: 9, width: 200, height: 6 });
+  document.getElementById("svg_form_time").appendChild(rect);
+  // <g><rect x="12" y="9" width="200" height="6"></rect></g>'
+  var circle = makeSVG("circle", {
+    cx: positionX,
+    cy: 12,
+    r: 12,
+    width: positionX,
+    height: 6
+  });
+  document.getElementById("svg_form_time").appendChild(circle);
+}
+
+var circle = makeSVG("circle", {
+  cx: positionX + 200,
+  cy: 12,
+  r: 12,
+  width: positionX,
+  height: 6
+});
+document.getElementById("svg_form_time").appendChild(circle);
+
+$('#svg_form_time rect').css('fill',base_color);
+$('#svg_form_time circle').css('fill',base_color);
+$("circle:nth-of-type(1)").css("fill", active_color);
+
+ 
+$(".button").click(function () {
+  $("#svg_form_time rect").css("fill", active_color);
+  $("#svg_form_time circle").css("fill", active_color);
+  var id = $(this).attr("id");
+  if (id == "next") {
+    $("#prev").removeClass("disabled");
+    if (child >= length) {
+      $(this).addClass("disabled");
+      $('#submit').removeClass("disabled");
+    }
+    if (child <= length) {
+      child++;
+    }
+    if (child == 2){
+        $(this).addClass("disabled");
+       //$(this).text('nono');
+        var currentTime = new Date().getTime();
+        setTimeout(function(){$("#next").removeClass("disabled");}, 5000);
+    
+    }
+
+  } else if (id == "prev") {
+    $("#next").removeClass("disabled");
+    $('#submit').addClass("disabled");
+    if (child <= 2) {
+      $(this).addClass("disabled");
+    }
+    if (child > 1) {
+      child--;
+    }
+  }
+  var circle_child = child + 1;
+  $("#svg_form_time rect:nth-of-type(n + " + child + ")").css(
+    "fill",
+    base_color
+  );
+  $("#svg_form_time circle:nth-of-type(n + " + circle_child + ")").css(
+    "fill",
+    base_color
+  );
+  var currentSection = $("section:nth-of-type(" + child + ")");
+  currentSection.fadeIn();
+  currentSection.css('transform','translateX(0)');
+ currentSection.prevAll('section').css('transform','translateX(-100px)');
+  currentSection.nextAll('section').css('transform','translateX(100px)');
+  $('section').not(currentSection).hide();
+});
+
+});
+        </script>
+    </head> 
+    <body> 
+        <form action="traitement.php" method="get">
+
+
+            <div id="svg_wrap"></div>
+           <section>
+             <iframe src="https://forms.office.com/Pages/ResponsePage.aspx?id=mXFFv61sKE6fKp2Za1MDGdYGINYX3HFIs51ABwYp-uBUOFk1U1Y4TjdKQlNQSUhEVUhURVNUSVNHQS4u" width="640" height="650" frameborder="0" marginheight="0" marginwidth="0">Chargement…</iframe>
+
+
+           </section>
+           
+           <section>
+             <h2>Mot de bienvenue </h2>
+  <embed
+    src="https://www.youtube.com/embed/SzvNr-CINu8"
+    wmode="transparent"
+    type="video/mp4"
+    width="400"
+    allow="autoplay; encrypted-media; picture-in-picture"
+    allowfullscreen
+    title="Keyboard Cat"
+    class="video"
+  >
+</br>
+
+           </section>
+           
+           <section>
+               <h4>Vous aurez besoin de l’application TEAMS pour rencontrer vos enseignants.<a href="https://www.microsoft.com/fr-ca/microsoft-teams/download-app"target="_blank">Téléchargez-là ici.</a></h4>
+             <p>Cliquez sur votre programme : </p>
+             <table id="tb"><tr class="programs-list-header">
+                <td class="tete"><strong>Affaires</strong></td>          
+            </tr>
+
+            
+                    <tr class="programs-list-item">
+                        <td><a href="https://teams.microsoft.com/l/meetup-join/19%3ameeting_OGVkNTA3MDYtOTc4Ni00Y2EwLTkyNjktZjZjOTU0MzM5Y2Ex%40thread.v2/0?context=%7b%22Tid%22%3a%22bf457199-6cad-4e28-9f2a-9d996b530319%22%2c%22Oid%22%3a%22d62006d6-dc17-4871-b39d-40070629fae0%22%7d"target="_blank">Techniques de comptabilité</a></td>
+                        
+                    </tr>
+                
+        
+            <tr class="programs-list-header">
+                <td class="tete"><strong>Bâtiment et génie</strong></td>          
+                
+            </tr>
+
+            
+                    <tr class="programs-list-item">
+                        <td><a id="Tmeuble" href="https://teams.microsoft.com/l/meetup-join/19%3ameeting_OTQyN2VjMGItYTdlNS00ZDg4LWI2YzQtZDE3YzA1NDYzODVm%40thread.v2/0?context=%7b%22Tid%22%3a%22bf457199-6cad-4e28-9f2a-9d996b530319%22%2c%22Oid%22%3a%22d62006d6-dc17-4871-b39d-40070629fae0%22%7d"target="_blank">Techniques d'ébénisterie et du meuble</a></td>
+                        
+                    </tr>
+                
+        
+            <tr class="programs-list-header">
+                <td class="tete"><strong>Sciences de la santé</strong></td>          
+            </tr>
+
+            
+                    <tr class="programs-list-item">
+                        <td><a id="3" href="https://teams.microsoft.com/l/meetup-join/19%3ameeting_NmZlMzFmN2MtZjMwYi00YmFjLWFhMGUtNmJmNzEzMjc3NGJi%40thread.v2/0?context=%7b%22Tid%22%3a%22bf457199-6cad-4e28-9f2a-9d996b530319%22%2c%22Oid%22%3a%22d62006d6-dc17-4871-b39d-40070629fae0%22%7d"target="_blank">Assistance dentaire - niveau II</a></td>
+                        
+                    </tr>
+                
+                    <tr class="programs-list-item">
+                        <td><a id="4" href="https://teams.microsoft.com/l/meetup-join/19%3ameeting_YmM3MzlhOGEtOWYxMC00MWFmLTkyYTYtZTEyMjdkYzY2YzY2%40thread.v2/0?context=%7b%22Tid%22%3a%22bf457199-6cad-4e28-9f2a-9d996b530319%22%2c%22Oid%22%3a%22d62006d6-dc17-4871-b39d-40070629fae0%22%7d"target="_blank">Service de soutien en foyer de soins spéciaux</a></td>
+                        
+                    </tr>
+                
+                    <tr class="programs-list-item">
+                        <td><a id="5" href="https://teams.microsoft.com/l/meetup-join/19%3ameeting_YmM3MzlhOGEtOWYxMC00MWFmLTkyYTYtZTEyMjdkYzY2YzY2%40thread.v2/0?context=%7b%22Tid%22%3a%22bf457199-6cad-4e28-9f2a-9d996b530319%22%2c%22Oid%22%3a%22d62006d6-dc17-4871-b39d-40070629fae0%22%7d"target="_blank">Service de soutien en soins infirmiers</a></td>
+                        
+                    </tr>
+                
+                    <tr class="programs-list-item">
+                        <td><a id="6" href="https://teams.microsoft.com/l/meetup-join/19%3ameeting_OTExNjg2ZjctZjhlYS00M2JjLTg4MGMtODI2MzVmNjZhODQ1%40thread.v2/0?context=%7b%22Tid%22%3a%22bf457199-6cad-4e28-9f2a-9d996b530319%22%2c%22Oid%22%3a%22d62006d6-dc17-4871-b39d-40070629fae0%22%7d"target="_blank">Soins infirmiers auxiliaires</a></td>
+                        
+                    </tr>
+                
+                    <tr class="programs-list-item">
+                        <td><a id="7" href="https://teams.microsoft.com/l/meetup-join/19%3ameeting_MDliNWYyNGEtMjY1Yy00ODA2LWE5MGUtYzU3ZjYzNGZiZGRj%40thread.v2/0?context=%7b%22Tid%22%3a%22bf457199-6cad-4e28-9f2a-9d996b530319%22%2c%22Oid%22%3a%22d62006d6-dc17-4871-b39d-40070629fae0%22%7d" target="_blank" rel="noopener">Techniques de réadaptation</a></td>
+                        
+                    </tr>
+                
+                    <tr class="programs-list-item">
+                        <td><a id="8" href="https://teams.microsoft.com/l/meetup-join/19%3ameeting_NTRkZmQwMzMtNGMzNC00MGYwLTg0YWUtZWRjNTEzNjI1Mjgw%40thread.v2/0?context=%7b%22Tid%22%3a%22bf457199-6cad-4e28-9f2a-9d996b530319%22%2c%22Oid%22%3a%22d62006d6-dc17-4871-b39d-40070629fae0%22%7d"target="_blank">Techniques en pharmacie</a></td>
+                        
+                    </tr>
+                
+                    <tr class="programs-list-item">
+                        <td><a id="9" href="https://teams.microsoft.com/l/meetup-join/19%3ameeting_YzU1ZDQxMWItNzE0Ny00NzA3LWE2OTQtZmUxZjc4MWNmOGVl%40thread.v2/0?context=%7b%22Tid%22%3a%22bf457199-6cad-4e28-9f2a-9d996b530319%22%2c%22Oid%22%3a%22d62006d6-dc17-4871-b39d-40070629fae0%22%7d"target="_blank">Technologie d'électrophysiologie médicale - cardiologie</a></td>
+                        
+                    </tr>
+                
+        
+            <tr class="programs-list-header">
+                <td class="tete"><strong>Sciences naturelles</strong></td>          
+                
+            </tr>
+
+            
+                    <tr class="programs-list-item">
+                        <td><a id="10" href="https://teams.microsoft.com/l/meetup-join/19%3ameeting_YTY3ZWMyYmQtMmE4Ni00NTFlLTgzYzYtM2YyYzcwYTQ5ZTE2%40thread.v2/0?context=%7b%22Tid%22%3a%22bf457199-6cad-4e28-9f2a-9d996b530319%22%2c%22Oid%22%3a%22d62006d6-dc17-4871-b39d-40070629fae0%22%7d"target="_blank">Culture du cannabis</a></td>
+                        
+                    </tr>
+                
+        
+            <tr class="programs-list-header">
+                <td class="tete"><strong>Secrétariat</strong></td>          
+                
+            </tr>
+
+            
+                    <tr class="programs-list-item">
+                        <td><a id="11" href="https://teams.microsoft.com/l/meetup-join/19%3ameeting_OGVkNTA3MDYtOTc4Ni00Y2EwLTkyNjktZjZjOTU0MzM5Y2Ex%40thread.v2/0?context=%7b%22Tid%22%3a%22bf457199-6cad-4e28-9f2a-9d996b530319%22%2c%22Oid%22%3a%22d62006d6-dc17-4871-b39d-40070629fae0%22%7d"target="_blank">Secrétariat médical</a></td>
+                        
+                    </tr>
+                
+                    <tr class="programs-list-item">
+                        <td><a id="12" href="https://teams.microsoft.com/l/meetup-join/19%3ameeting_OGVkNTA3MDYtOTc4Ni00Y2EwLTkyNjktZjZjOTU0MzM5Y2Ex%40thread.v2/0?context=%7b%22Tid%22%3a%22bf457199-6cad-4e28-9f2a-9d996b530319%22%2c%22Oid%22%3a%22d62006d6-dc17-4871-b39d-40070629fae0%22%7d"target="_blank">Travail général de bureau</a></td>
+                        
+                    </tr>
+                
+        
+            <tr class="programs-list-header">
+                <td class="tete"><strong>Services communautaires</strong></td>          
+                
+            </tr>
+                
+                    <tr class="programs-list-item">
+                        <td><a id="13" href="https://teams.microsoft.com/l/meetup-join/19%3ameeting_MGI5N2YzZDktMmJjYS00YmIyLTg5MmItN2QzMzIzYzZmMzRm%40thread.v2/0?context=%7b%22Tid%22%3a%22bf457199-6cad-4e28-9f2a-9d996b530319%22%2c%22Oid%22%3a%22d62006d6-dc17-4871-b39d-40070629fae0%22%7d"target="_blank">Techniques d'intervention en éducation spécialisée et autisme</a></td>
+                        
+                    </tr>
+                
+                    <tr class="programs-list-item">
+                        <td><a id="13" href="https://teams.microsoft.com/l/meetup-join/19%3ameeting_MGI5N2YzZDktMmJjYS00YmIyLTg5MmItN2QzMzIzYzZmMzRm%40thread.v2/0?context=%7b%22Tid%22%3a%22bf457199-6cad-4e28-9f2a-9d996b530319%22%2c%22Oid%22%3a%22d62006d6-dc17-4871-b39d-40070629fae0%22%7d"target="_blank">Techniques d'intervention en santé mentale et vieillissement</a></td>
+
+                    </tr>
+
+                    <tr class="programs-list-item">
+                        <td><a id="13" href="https://teams.microsoft.com/l/meetup-join/19%3ameeting_ZTcwOGNjNDItMGI3OC00NGJiLWE4NzgtYjM2YzcxMjdhM2I1%40thread.v2/0?context=%7b%22Tid%22%3a%22bf457199-6cad-4e28-9f2a-9d996b530319%22%2c%22Oid%22%3a%22d62006d6-dc17-4871-b39d-40070629fae0%22%7d"target="_blank">Éducation à l’enfance</a></td>
+
+                    </tr>
+
+<tr class="programs-list-item">
+                        <td><a id="13" href="https://teams.microsoft.com/l/meetup-join/19%3ameeting_YjZkOGQ3NDEtZTI4NC00NjM2LTk5NmItZDY3MTcwODk1MTIy%40thread.v2/0?context=%7b%22Tid%22%3a%22bf457199-6cad-4e28-9f2a-9d996b530319%22%2c%22Oid%22%3a%22d62006d6-dc17-4871-b39d-40070629fae0%22%7d"target="_blank">Éducation à l’enfance à distance</a></td>
+
+                    </tr>
+                
+        
+             </table>
+             
+           </section>
+           
+           <section>
+
+<h2>Voici nos services!</h2>
+<div class="dropdown">
+  <button class="dropbtn">Services aux etudiants</button>
+  <div class="dropdown-content">
+    <a href="https://www.youtube.com/watch?v=g1_gvlIu83c"target="_blank">Visite virtuelle</a>
+    <a href="https://campbellton.evenementsccnb.ccnb.ca/association-etudiante-du-ccnb-campus-de-campbellton/"target="_blank">Association étudiante</a>
+    <a href="https://campbellton.evenementsccnb.ccnb.ca/association-des-anciens-anciennes-et-amies-du-ccnb-campus-de-campbellton/"target="_blank">Association des anciens, anciennes et ami(e)s du Campus de Campbellton</a>
+
+  </div>
+</div>
+<div class="dropdown">
+  <button class="dropbtn">Informations pertinentes  </button>
+  <div class="dropdown-content">
+    <a href="https://campbellton.evenementsccnb.ccnb.ca/wp-content/uploads/sites/3/2021/04/Presentation-le-CUBE-3.mp4"target="_blank">Vidéo CUBE</a>
+    <a href="https://campbellton.evenementsccnb.ccnb.ca/prets-etudiants/"target="_blank">Prêts étudiants</a>
+    <a href="https://campbellton.evenementsccnb.ccnb.ca/wp-content/uploads/sites/3/2021/04/Trousse2021-PDF-INTERACTIF-FINALE.pdf"target="_blank">Trousse d’information – rentrée collégiale </a>
+    <a href="https://campbellton.evenementsccnb.ccnb.ca/wp-content/uploads/sites/3/2021/04/Garderie.pdf"target="_blank">Garderie</a>
+    <a href="https://ccnb.ca/admission-et-bourses/services-aux-etudiants/logement.aspx"target="_blank">Logement</a>
+    <a href="https://www.facebook.com/destinationrestigouche"target="_blank">Destination Restigouche</a>
+    
+  </div>
+</div>
+
+
+<div class="dropdown">
+  <button class="dropbtn">Autres ressources</button>
+  <div class="dropdown-content">
+    <a href="https://campbellton.evenementsccnb.ccnb.ca/wp-content/uploads/sites/3/2021/04/AnnexeA2-ConsignesEtudiants-20200831.pdf"target="_blank">Formulaire COVID</a>
+    <a href="https://campbellton.evenementsccnb.ccnb.ca/dossier-de-verification-criminelle/"target="_blank">Vérification de casier judiciaire</a>
+    <a href="https://campbellton.evenementsccnb.ccnb.ca/wp-content/uploads/sites/3/2021/05/Immunisation2492.docx"target="_blank">Formulaire d’immunisation (Français)</a>
+<a href="https://campbellton.evenementsccnb.ccnb.ca/wp-content/uploads/sites/3/2021/05/Immunization2493.docx"target="_blank">Formulaire d’immunisation (Anglais)</a>
+  </div>
+</div> <div class="dropdown">
+  <button class="dropbtn">Bourses</button>
+  <div class="dropdown-content">
+    <a href="https://ccnb.ca/admission-et-bourses/aide-financi%C3%A8re-et-bourses.aspx"target="_blank">Aide financière et bourses</a>
+    <a href="https://onbcanada.ca/fr/bourses-fierte-nb/"target="_blank">Bourses Fierté NB 2021 - Opportunités NB</a>
+    <a href="https://ccnb.ca/media/548615/formulairecnfsboursecnfs_nolink.pdf"target="_blank">Bourse de recrutement CNFS</a>
+   <a href="https://ccnb.ca/media/548618/formulairecnfsboursehomme_nolink.pdf"target="_blank">Bourse de recrutement pour hommes du CNFS</a>
+  </div>
+</div>
+</br></br></br>
+
+
+<div id="table_text">
+<table style="width:100%">
+  <tr>
+    <td><img src="https://campbellton.evenementsccnb.ccnb.ca/wp-content/uploads/sites/3/2021/05/Brigitte-Landry-2.jpg" alt="Brigitte Landry" ></td>
+    <td><p>Brigitte Landry</br>Conseillère en orientation</br><a href="mailto:Brigitte.landry@ccnb.ca">Brigitte.landry@ccnb.ca</a></br>Lien booking : <a href="https://bit.ly/3nJ5YG6" target="_blank" rel="noopener">cliquez ici!</a>
+</br>Vous voulez discuter en direct ? <a href="https://teams.microsoft.com/l/meetup-join/19%3ameeting_Mzg2OWFlNjEtMzA2ZC00MDA1LWFkZWUtZWRhZDZjNDExNjYw%40thread.v2/0?context=%7b%22Tid%22%3a%22bf457199-6cad-4e28-9f2a-9d996b530319%22%2c%22Oid%22%3a%22d62006d6-dc17-4871-b39d-40070629fae0%22%7d" target="_blank" rel="noopener">cliquez ici!</a></p>
+</td>
+  </tr>
+  <tr>
+    <td><p>Priscilla Vienneau</br>Registraire</br><a href="mailto:Priscilla.vienneau@ccnb.ca">Priscilla.vienneau@ccnb.ca</a></br>Lien booking : <a href="https://bit.ly/3nJ5YG6" target="_blank" rel="noopener">cliquez ici!</a>
+</br>Vous voulez discuter en direct ? <a href="https://teams.microsoft.com/l/meetup-join/19%3ameeting_OGM2OGQ4M2QtMTdiOC00ZDExLTlmZmMtNDcwOTMxM2VjZGJj%40thread.v2/0?context=%7b%22Tid%22%3a%22bf457199-6cad-4e28-9f2a-9d996b530319%22%2c%22Oid%22%3a%22d62006d6-dc17-4871-b39d-40070629fae0%22%7d" target="_blank" rel="noopener">cliquez ici!</a></p></td>
+    <td><img src="https://campbellton.evenementsccnb.ccnb.ca/wp-content/uploads/sites/3/2021/05/Priscilla-Vienneau-2.jpg" alt="Priscilla Vienneau" ></td>
+  </tr>
+    <tr>
+    <td><img src="https://campbellton.evenementsccnb.ccnb.ca/wp-content/uploads/sites/3/2021/05/Katie-Perron.jpg" alt="Katie Perron" ></td>
+    <td><p>Katie Perron</br>Coordinatrice d’inclusion</br><a href="mailto:Katie.perron@ccnb.ca">Katie.perron@ccnb.ca</a></br>Lien booking : <a href="https://bit.ly/3nJ5YG6" target="_blank" rel="noopener">cliquez ici!</a>
+</br>Vous voulez discuter en direct ? <a href="https://teams.microsoft.com/l/meetup-join/19%3ameeting_NzUwYzI3MDktOTRlMi00NmMzLTk2ZDMtNzhjYmE2YjA1ZjE0%40thread.v2/0?context=%7b%22Tid%22%3a%22bf457199-6cad-4e28-9f2a-9d996b530319%22%2c%22Oid%22%3a%22d62006d6-dc17-4871-b39d-40070629fae0%22%7d" target="_blank" rel="noopener">cliquez ici!</a></p>
+</td>
+  </tr>
+<tr>
+    <td><p>Honorine Ngountchoup</br>Soutien à l’accueil et l’intégration des étudiants internationaux  </br><a href="mailto:Honorine.ngountchoup@ccnb.ca">Honorine.ngountchoup@ccnb.ca</a></br>Vous voulez discuter en direct ? <a href="https://teams.microsoft.com/l/meetup-join/19%3ameeting_OWE3ZWIzZmItZjMxZS00Y2NhLWI2MzItNWYxZjk4YTU2NGEy%40thread.v2/0?context=%7b%22Tid%22%3a%22bf457199-6cad-4e28-9f2a-9d996b530319%22%2c%22Oid%22%3a%22d62006d6-dc17-4871-b39d-40070629fae0%22%7d" target="_blank" rel="noopener">cliquez ici!</a></p></td>
+    <td><img src="https://campbellton.evenementsccnb.ccnb.ca/wp-content/uploads/sites/3/2021/05/Honorine-Ngountchoup-2.jpg" alt="Honorine Ngountchoup" ></td>
+  </tr>
+    <tr>
+    <td><img src="https://campbellton.evenementsccnb.ccnb.ca/wp-content/uploads/sites/3/2021/05/Kathy-Horan-2.jpg" alt="Kathy Horan" ></td>
+    <td><p>Kathy Horan</br>Aide-Bibliothécaire</br><a href="mailto:Kathy.Horan@ccnb.ca">Kathy.Horan@ccnb.ca</a></p>
+</td>
+  </tr>
+<tr>
+    <td><p>Mylène Comeau</br>Coordinatrice à la vie étudiante</br><a href="mailto:Mylene.comeau@ccnb.ca">Mylene.comeau@ccnb.ca</a></br></p></td>
+    <td><img src="https://campbellton.evenementsccnb.ccnb.ca/wp-content/uploads/sites/3/2021/05/Mylene-Comeau.jpg" alt="Mylène Comeau" ></td>
+  </tr>
+    <tr>
+    <td><img src="https://campbellton.evenementsccnb.ccnb.ca/wp-content/uploads/sites/3/2021/05/Line-Pitre-2.jpg" alt="Line Pitre" ></td>
+    <td><p>Line Pitre </br>Adjointe administrative – services aux étudiants</br><a href="mailto:Line.pitre@ccnb.ca">Line.pitre@ccnb.ca</a></p>
+</td>
+  </tr>
+
+<tr>
+    <td><p>Hélène Cyr</br>Réceptionniste</br><a href="mailto:Helene.cyr@ccnb.ca">Helene.cyr@ccnb.ca</a></br></p></td>
+    <td><img src="https://campbellton.evenementsccnb.ccnb.ca/wp-content/uploads/sites/3/2021/05/Helene-Cyr-2.jpg" alt="Hélène Cyr" ></td>
+  </tr>
+    <tr>
+    <td><img src="https://campbellton.evenementsccnb.ccnb.ca/wp-content/uploads/sites/3/2021/05/Nancy-Godbout-Levesque-2.jpg" alt="Nancy Godbout-Levesque " ></td>
+    <td><p>Nancy Godbout-Levesque</br>Adjointe administrative et présidente de l’AAACCC</br><a href="mailto:Nancy.godbout-levesque@ccnb.ca">Nancy.godbout-levesque@ccnb.ca</a></p>
+</td>
+  </tr>
+<tr>
+    <td><p>Denise Savoie</br>Adjointe administrative au registraire</br><a href="mailto:Denise.savoie@ccnb.ca">Denise.savoie@ccnb.ca</a></br></p></td>
+    <td><img src="https://campbellton.evenementsccnb.ccnb.ca/wp-content/uploads/sites/3/2021/05/Denise-Savoie.jpg" alt="Denise Savoie" ></td>
+  </tr>
+    <tr>
+    <td><img src="https://campbellton.evenementsccnb.ccnb.ca/wp-content/uploads/sites/3/2021/05/Tany-Ndopedro.jpg" alt="Tany Ndopedro" ></td>
+    <td><p>Tany Ndopedro</br>Intervenante en santé mentale</br><a href="mailto:Tany.ndopedro@ccnb.ca">Tany.ndopedro@ccnb.ca</a></br>Lien booking : <a href="https://bit.ly/3nJ5YG6" target="_blank" rel="noopener">cliquez ici!</a></p>
+</td>
+  </tr>
+<tr>
+    <td><p>Virginie Allard</br>Agente de liaison au recrutement</br><a href="mailto:Virginie.allard@ccnb.ca ">Virginie.allard@ccnb.ca </a></br>Lien booking : <a href="https://clic.ccnb.ca/virginie" target="_blank" rel="noopener">cliquez ici!</a></p></td>
+    <td><img src="https://campbellton.evenementsccnb.ccnb.ca/wp-content/uploads/sites/3/2021/05/Virginie-Allard.jpg" alt="Virginie Allard" ></td>
+  </tr>
+    <tr>
+    <td><img src="https://campbellton.evenementsccnb.ccnb.ca/wp-content/uploads/sites/3/2021/05/Chantal-Leblanc-2.jpg" alt="Chantal Leblanc" ></td>
+    <td><p>Chantal Leblanc</br>Centre d’aide en français</br><a href="mailto:Chantal.leblanc@ccnb.ca">Chantal.leblanc@ccnb.ca</a></p>
+</td>
+  </tr>
+<tr>
+    <td><p>Nathalie Philippe</br>Association des anciens, anciennes et ami(e)s du CCNB – Campus de Campbellton</br><a href="mailto:Nathalie.philippe@ccnb.ca">Nathalie.philippe@ccnb.ca</a></p></td>
+    <td><img src="https://campbellton.evenementsccnb.ccnb.ca/wp-content/uploads/sites/3/2021/05/Nathalie-Phillippe.jpg" alt="Nathalie Philippe" ></td>
+  </tr>
+</table>
+</div>
+</br></br></br>
+           </section>
+           
+           <section>
+<h2>Sondage<h2/>
+  <embed
+    src="https://forms.office.com/Pages/ResponsePage.aspx?id=mXFFv61sKE6fKp2Za1MDGdYGINYX3HFIs51ABwYp-uBUNlBPT0I1UjZPSFdMSjlLOE0yWkNDOEE5Ti4u&embed=true"
+    wmode="transparent"    width="400"
+    title="Keyboard Cat"
+    class="video"
+  >
+
+           </section>
+           
+             <div class="button" id="prev">&larr; Précédent</div>
+           <div class="button" id="next"><a href="#svg_wrap" style="color: white;">Suivant &rarr;</a></div>
+           <div class="button" id="submit"><a href="https://campbellton.evenementsccnb.ccnb.ca/services-aux-etudiants/" style="color: white;">Services aux étudiants</a></div>
+           
+
+        </form> 
+
+    </body> 
+</html>
+<!-- /wp:html -->
